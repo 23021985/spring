@@ -1,16 +1,13 @@
 package com.novi.eindopdracht.idrunk.config;
 
-//import nl.gettoworktogether.security_with_jwt.filter.JwtRequestFilter;
-//import nl.gettoworktogether.security_with_jwt.service.CustomUserDetailsService;
-
 import com.novi.eindopdracht.idrunk.filter.JwtRequestFilter;
-//import com.novi.eindopdracht.idrunk.service.CustomUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -27,31 +24,33 @@ import javax.sql.DataSource;
 public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    public UserDetailsService userDetailsService;
-
-    @Autowired
     private JwtRequestFilter jwtRequestFilter;
 
     @Autowired
     DataSource dataSource;
 
-
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//        auth.userDetailsService(customUserDetailsService);
-        auth.jdbcAuthentication().dataSource(dataSource)
-                .usersByUsernameQuery("SELECT mail, password, TRUE FROM persons WHERE mail=?")
-                .authoritiesByUsernameQuery("SELECT mail, authority FROM authorities AS a WHERE mail=?");
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
-    @Override
     @Bean
+    @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+    public UserDetailsService userDetailsService() {
+        return super.userDetailsService();
+    }
+
+    @Autowired
+    public void configure(AuthenticationManagerBuilder auth) throws Exception {
+//        auth.userDetailsService(customUserDetailsService);
+        auth.jdbcAuthentication().dataSource(dataSource)
+                .usersByUsernameQuery("SELECT mail, password, TRUE FROM users WHERE mail=?")
+                .authoritiesByUsernameQuery("SELECT mail, authority FROM authorities AS a WHERE mail=?");
     }
 
     @Override
@@ -70,7 +69,8 @@ public class SpringSecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-//        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
     }
 

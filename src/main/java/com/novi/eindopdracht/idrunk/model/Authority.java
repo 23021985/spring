@@ -12,6 +12,15 @@ public class Authority implements Serializable {
     @Id
     @Column(nullable = false)
     private String mail;
+//    private String username;
+
+//    public String getUsername() {
+//        return username;
+//    }
+//
+//    public void setUsername(String username) {
+//        this.username = username;
+//    }
 
     @Id
     @Column(nullable = false)

@@ -22,11 +22,11 @@ public class User {
     private String apikey;
 
     @Column
-    private String email;
+    private String mail;
 
     @OneToMany(
             targetEntity = com.novi.eindopdracht.idrunk.model.Authority.class,
-            mappedBy = "username",
+            mappedBy = "mail",
             cascade = CascadeType.ALL,
             orphanRemoval = true,
             fetch = FetchType.EAGER)
@@ -64,12 +64,12 @@ public class User {
         this.apikey = apikey;
     }
 
-    public String getEmail() {
-        return email;
+    public String getMail() {
+        return mail;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setMail(String mail) {
+        this.mail = mail;
     }
 
     public Set<Authority> getAuthorities() {
